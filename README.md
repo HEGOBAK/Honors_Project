@@ -15,7 +15,40 @@ It provides a **menu-driven interface** that allows users to:
 
 ## Project Structure
 
-HuffmanEncodingProject/ ├── README.md # Overview of the project (instructions below) ├── data/ # Folder for input text files and test data │ ├── input.txt # Provided sample input (like the paragraph given in Test Data) │ └── other_test.txt # (Optional) Other text files for testing ├── output/ # Folder for output files │ ├── encoded.bin # Encoded binary files │ └── decoded.txt # Decoded text files ├── src/ # All source (.cpp) files │ ├── main.cpp # Main function and menu-driven logic │ ├── huffman.cpp # Implementation of Huffman tree, encoding/decoding │ └── linked_list.cpp # Implementation for linked list (to store nodes) ├── include/ # All header (.h) files │ ├── huffman.h # Huffman tree class/struct declarations │ └── linked_list.h # Linked list class/struct declarations ├── docs/ # Documentation │ ├── design_diagrams/ # UML and structural charts (optional) │ │ ├── linked_list_uml.png │ │ └── huffman_tree_chart.png │ └── project_presentation.pptx # PowerPoint/Word/pdf presentation ├── tests/ # Folder for unit tests (optional but recommended) │ └── test_huffman.cpp # Unit tests for Huffman functionality └── Makefile # (Optional) For building the project easily
+
+```bash
+HuffmanEncodingProject/
+│
+├── README.md          # Overview of the project (instructions below)
+│
+├── data/              # Folder for input text files and test data
+│   ├── input.txt      # Provided sample input (like the paragraph given in Test Data)
+│   └── other_test.txt # (Optional) Other text files for testing
+│
+├── output/            # Folder for output files
+│   ├── encoded.bin    # Encoded binary files
+│   └── decoded.txt    # Decoded text files
+│
+├── src/               # All source (.cpp) files
+│   ├── main.cpp       # Main function and menu-driven logic
+│   ├── huffman.cpp    # Implementation of Huffman tree, encoding/decoding
+│   └── linked_list.cpp # Implementation for linked list (to store nodes)
+│
+├── include/           # All header (.h) files
+│   ├── huffman.h      # Huffman tree class/struct declarations
+│   └── linked_list.h  # Linked list class/struct declarations
+│
+├── docs/              # Documentation
+│   ├── design_diagrams/ # UML and structural charts (optional)
+│   │   ├── linked_list_uml.png
+│   │   └── huffman_tree_chart.png
+│   └── project_presentation.pptx # Your PowerPoint/Word/pdf presentation
+│
+├── tests/             # Folder for unit tests (optional but recommended)
+│   └── test_huffman.cpp # Unit tests for Huffman functionality
+│
+└── Makefile           # (Optional) For building the project easily
+```
 
 
 ### Folders and their Purpose
