@@ -20,9 +20,9 @@ The user can select from the following options:
 
 ### 1. Print Character Frequencies
 - **What it does:**  
-  Displays each character found in the input text along with its frequency count.
+  Displays each printable character (ASCII 32–126) along with its frequency count.  
 - **Logic:**  
-  Read the text file, build a hash table (`std::unordered_map<char, int>`) mapping each character to how many times it appears, and print the results.
+  Read the text file and maintain a fixed array of length 95 (one slot for each printable code). For each character `c`, do  
 - **Where implemented:**  
   Function in `src/huffman.cpp`, called from `src/main.cpp`.
 
@@ -60,9 +60,9 @@ The user can select from the following options:
 
 ### 5. Enter a Word and Encode It
 - **What it does:**  
-  Allows the user to input a word and encodes it into a Huffman binary string.
+  Prompts the user for a word, then return its binary representation and huffman code.
 - **Logic:**  
-  For each character in the input word, find the Huffman code and concatenate the codes to form the encoded binary string.
+  For each character in the input word, prints its ASCII binary representation (8 bits as a string of 0s and 1s) and find the Huffman code and concatenate the codes to form the encoded binary string.
 - **Where implemented:**  
   Encoding logic in `src/huffman.cpp`.
 
