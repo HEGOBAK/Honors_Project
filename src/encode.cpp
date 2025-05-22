@@ -1,3 +1,10 @@
+/* **************************************** */
+/*                                          */
+/*     Project: CIS22C Huffman Encoding     */
+/*     Authors: Jeriel & Chu                */
+/*                                          */
+/* **************************************** */
+
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -5,7 +5,7 @@
 /*                                          */
 /* **************************************** */
 
-/* Purpose : Menu */
+/* Purpose : Menu + wiring Huffman state through options */
 
 #include <iostream>
 #include <string>
@@ -13,113 +13,79 @@
 
 using namespace std;
 
-// declarations
+// --- our menu‐actio ---
 void printMenu();
-void printCharacterFrequencies();
-void printTree();
-void printHuffmanCodes();
-void showSingleCharCode();
+void printCharacterFrequencies(const int freq[]);
+void printTree(SingleNode* root);
+void printHuffmanCodes(const string codes[]);
+void showSingleCharCode(const string codes[]);
 void encodeWord();
-void decodeText();
-void encodeFile();
-void decodeFile();
+void decodeText(SingleNode* root);
+void encodeFile(int freq[], SingleNode*& root, string codes[]);
+void decodeFile(SingleNode* root);
 
 int main() {
-    int choice;
+    // --- this “state” lives across menu calls ---
+    bool      fileEncoded = false;
+    int       freq[128]   = {0};           // character counts
+    SingleNode* root      = nullptr;       // Huffman‐tree root
+    string    codes[128];                  // bit-strings for each ASCII
 
+    int choice;
     while (true) {
-		printMenu();
+        printMenu();
 
         if (!(cin >> choice)) {
-            cin.clear();                       // clear error flag
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');            // discard chars until newline
-			cout << "\n<=============================>\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\n<=============================>\n";
             cout << "Invalid input; please enter a number between 1 and 9\n";
             continue;
         }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "\n<=============================>\n";
 
-        // clear any leftover input after a valid number
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');                // discard chars until newline
-		cout << "\n<=============================>\n";
+        // block everything except (7) load-and-encode and (9) quit
+        if (!fileEncoded && choice != 7 && choice != 9) {
+            cout << "⚠  Please choose option 7 first to load & encode a file.\n";
+            continue;
+        }
 
         switch (choice) {
             case 1:
-                printCharacterFrequencies();
+                printCharacterFrequencies(freq);
                 break;
             case 2:
-                printTree();
+                printTree(root);
                 break;
             case 3:
-                printHuffmanCodes();
+                printHuffmanCodes(codes);
                 break;
             case 4:
-                showSingleCharCode();
+                showSingleCharCode(codes);
                 break;
             case 5:
                 encodeWord();
                 break;
             case 6:
-                decodeText();
+                decodeText(root);
                 break;
             case 7:
-                encodeFile();
+                encodeFile(freq, root, codes);
+                fileEncoded = true;
                 break;
             case 8:
-                decodeFile();
+                decodeFile(root);
                 break;
             case 9:
                 cout << "Exiting program. Goodbye!\n";
+                // clean up
+                deleteTree(root);
                 return 0;
             default:
                 cout << "Invalid option, please try again.\n";
-				break;
+                break;
         }
     }
     return 0;
-}
-
-void printMenu() {
-	cout << "\n===== Huffman Coding Menu =====\n";
-	cout << "1. Print Character Frequencies\n";
-	cout << "2. Print Tree (Right-Root-Left Traversal)\n";
-	cout << "3. Print Huffman Codes\n";
-	cout << "4. Enter One Character and See its Huffman Code\n";
-	cout << "5. Enter a Word and Encode It\n";
-	cout << "6. Enter Encoded Text and Decode It\n";
-	cout << "7. Enter File Name to Encode Text and Save It\n";
-	cout << "8. Enter Encoded File Name to Decode and Save It\n";
-	cout << "9. Quit\n";
-	cout << "Select an option (1-9) : ";
-}
-
-// definitions
-void printCharacterFrequencies() {
-    cout << "[1] Print Character Frequencies - not implemented yet\n";
-}
-
-void printTree() {
-    cout << "[2] Print Tree - not implemented yet\n";
-}
-
-void printHuffmanCodes() {
-    cout << "[3] Print Huffman Codes - not implemented yet\n";
-}
-
-void showSingleCharCode() {
-    cout << "[4] Single Character Code - not implemented yet\n";
-}
-
-void encodeWord() {
-    cout << "[5] Encode Word - not implemented yet\n";
-}
-
-void decodeText() {
-    cout << "[6] Decode Text - not implemented yet\n";
-}
-
-void encodeFile() {
-    cout << "[7] Encode File - not implemented yet\n";
-}
-void decodeFile() {
-    cout << "[8] Decode File - not implemented yet\n";
 }
