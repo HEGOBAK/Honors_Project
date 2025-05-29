@@ -7,53 +7,41 @@
 
 /* Purpose : Menu + wiring Huffman state through options */
 
-#include <iostream>
-#include <string>
-#include <limits>
+#include "../include/huffman.h"
 
-using namespace std;
-
-// --- our menu‐actio ---
-void printMenu();
-void printCharacterFrequencies(const int freq[]);
-void printTree(SingleNode* root);
-void printHuffmanCodes(const string codes[]);
-void showSingleCharCode(const string codes[]);
-void encodeWord();
-void decodeText(SingleNode* root);
-void encodeFile(int freq[], SingleNode*& root, string codes[]);
-void decodeFile(SingleNode* root);
+// --- our menu‐action (Left-Over) ---
+// void encodeWord();
+// void decodeText(SingleNode* root);
+// void decodeFile(SingleNode* root);
 
 int main() {
-    // --- this “state” lives across menu calls ---
-    bool      fileEncoded = false;
-    int       freq[128]   = {0};           // character counts
+    int     choice;
+    bool    fileEncoded = false;     // This ensure that at least one file has been encoded
     SingleNode* root      = nullptr;       // Huffman‐tree root
-    string    codes[128];                  // bit-strings for each ASCII
+    int     freq[NUM_PRINTABLE];     // frequency hash table
+    string  codes[NUM_PRINTABLE];    // Huffman code hash table
 
-    int choice;
     while (true) {
+        
+        // Clear the screen
+        clearScreen();
+
+        // List out the menu 
         printMenu();
 
-        if (!(cin >> choice)) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "\n<=============================>\n";
-            cout << "Invalid input; please enter a number between 1 and 9\n";
-            continue;
-        }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "\n<=============================>\n";
+        // Get user's choice
+        choice = getMenuChoice();
 
-        // block everything except (7) load-and-encode and (9) quit
+        // enforce that file must be encoded first
         if (!fileEncoded && choice != 7 && choice != 9) {
             cout << "⚠  Please choose option 7 first to load & encode a file.\n";
+            waitForEnter();
             continue;
         }
 
         switch (choice) {
             case 1:
-                printCharacterFrequencies(freq);
+                showCharFreq(freq);
                 break;
             case 2:
                 printTree(root);
@@ -62,26 +50,30 @@ int main() {
                 printHuffmanCodes(codes);
                 break;
             case 4:
-                showSingleCharCode(codes);
+                showCharCode(codes);
                 break;
             case 5:
-                encodeWord();
+                // encodeWord();
                 break;
             case 6:
-                decodeText(root);
+                // decodeText(root);
                 break;
             case 7:
-                encodeFile(freq, root, codes);
+                encodeFile(root, freq, codes);
                 fileEncoded = true;
                 break;
             case 8:
-                decodeFile(root);
+                // decodeFile(root);
                 break;
             case 9:
-                cout << "Exiting program. Goodbye!\n";
-                // clean up
-                deleteTree(root);
-                return 0;
+                if (fileEncoded) {
+                    clearState(root, freq, codes);
+                    if (quitting()) return 0;
+                    waitForEnter();
+                }
+                else
+                    return 0;
+                break;
             default:
                 cout << "Invalid option, please try again.\n";
                 break;
