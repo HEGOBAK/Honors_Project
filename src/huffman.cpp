@@ -7,6 +7,8 @@
 
 #include "../include/huffman.h"
 
+// <================= START => OPEN FILE  =================> //
+
 // ─── Ask for user input repeatedly until the user provides a valid filename ───
 ifstream openFile() {
     string filename;
@@ -40,6 +42,12 @@ ifstream openFile() {
     }
 }
 
+// <====================== Open File Is DONE ======================> //
+
+
+
+//  <======== Below Is From Open File -> Unordered Hash Table ========> //
+
 // ─── Extract data from file and count printable‐ASCII freqs into freq[0..127] ───
 void countFrequencies(ifstream& in, int freq[]) {
     // Initialize the hash table
@@ -53,6 +61,12 @@ void countFrequencies(ifstream& in, int freq[]) {
     }
     in.close();
 }
+
+// <====================== Hash Table Is DONE ======================> //
+
+
+
+// <======== Below Is From Hash Table -> Ordered Linked List ========> //
 
 // ─── Build the initial list (“tree”) of single-character nodes ───
 LinkedList* makeLinkedList(int hash_table[]) {
@@ -88,11 +102,11 @@ void insertSorted(LinkedList*& treeHead, SingleNode* node_toInsert) {
     cur->next  = newChar;
 }
 
+// <================= Ordered Linked List Is DONE =================> //
 
-// ---------------------- Ordered Linked List Is DONE ---------------------- //
 
-// ------------------- Below Is From Linked List -> Tree ------------------- //
 
+// <============== Below Is From Linked List -> Tree ==============> //
 
 // ─── Merge until only one SingleNode remains (the full Huffman tree) ───
 SingleNode* buildTree(LinkedList*& treeHead) {
@@ -118,11 +132,11 @@ SingleNode* buildTree(LinkedList*& treeHead) {
     return treeHead ? treeHead->characterNode : nullptr;
 }
 
+// <================= Huffman Tree Is DONE =================> //
 
-// ---------------------- Huffman Tree Is DONE ---------------------- //
 
-// ------------ Below Is From Huffman Tree -> Huffman Codes ------------ //
 
+// <======= Below Is From Huffman Tree -> Huffman Codes =======> //
 
 // ─── Walk the tree to generate Huffman Codes using recursive ───
 void generateCodes(SingleNode* node, const string& path, string codes[]) {
@@ -141,6 +155,12 @@ void generateCodes(SingleNode* node, const string& path, string codes[]) {
     }
 }
 
+// <================= Huffman Codes Is DONE =================> //
+
+
+
+// <================= Below Is Clear Tree =================> //
+
 // ─── Free memory using recursive ───
 void deleteTree(SingleNode* node) {
     if (!node) return;   // Base case
@@ -148,3 +168,5 @@ void deleteTree(SingleNode* node) {
     deleteTree(node->rightChild);
     delete node;  // Delete the root
 }
+
+// <================= Clear Tree Is DONE =================> //

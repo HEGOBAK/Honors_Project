@@ -27,5 +27,5 @@ void encodeFile(SingleNode*& root, int freq[], string codes[])
     generateCodes(root, "", codes);
 
     // Save the Huffman Codes into an output file
-    outFile(codes);
+    outFile(freq, codes);
 }
