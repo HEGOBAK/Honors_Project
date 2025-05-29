@@ -120,7 +120,6 @@ void inorder_display(SingleNode* node, int level) {
 }
 
 // ─── Postorder (left, right, root) ───
-
 void postorder_display(SingleNode* node, int level) {
     if (!node) return;   // Base case
 

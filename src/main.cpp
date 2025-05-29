@@ -59,6 +59,11 @@ int main() {
                 // decodeText(root);
                 break;
             case 7:
+                if (fileEncoded)
+                {
+                    clearState(root, freq, codes);
+                    fileEncoded = false;
+                }
                 encodeFile(root, freq, codes);
                 fileEncoded = true;
                 break;
@@ -68,6 +73,7 @@ int main() {
             case 9:
                 if (fileEncoded) {
                     clearState(root, freq, codes);
+                    fileEncoded = false;
                     if (quitting()) return 0;
                     waitForEnter();
                 }

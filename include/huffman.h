@@ -92,7 +92,7 @@ template<typename T>
 void showChar(const T table[], const string output);
 
 // ========== outFile.cpp ========== //
-void outFile(const int freq[], const string codes[]);
+void outFile(ifstream& in, const string codes[]);
 
 // ========== utilities.cpp ========== //
 void printMenu();

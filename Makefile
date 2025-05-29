@@ -18,7 +18,7 @@ SOURCES  = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS  = $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
 TARGET   = huffman
 
-.PHONY: all re clean
+.PHONY: all re clean clean-output clean-all
 
 all: $(TARGET)
 
@@ -35,8 +35,15 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 # "re" will clean then rebuild
-re: clean all
+re: clean-all all
 
-# Remove everything
+# remove build artifacts and executable only
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)
+
+# remove only the encoded output file
+clean-output:
+	rm -f output/encodedFile.txt
+
+# remove both build+binary AND output file
+clean-all: clean clean-output

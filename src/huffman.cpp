@@ -21,7 +21,7 @@ ifstream openFile() {
         }
 
         // try in current directory
-        ifstream in(filename, ios::binary);
+        ifstream in(filename);
         if (in) {
             cout << "Opened \"" << filename << "\" successfully.\n";
             waitForEnter();
@@ -30,7 +30,7 @@ ifstream openFile() {
 
         // try in ../tests/ if they gave just a fileName
         string alt = "tests/" + filename;
-        ifstream in2(alt, ios::binary);
+        ifstream in2(alt);
         if (in2) {
             cout << "Opened \"" << alt << "\" successfully.\n";
             return in2;
@@ -54,12 +54,14 @@ void countFrequencies(ifstream& in, int freq[]) {
     for (int i = 0; i < NUM_PRINTABLE; ++i) freq[i] = 0;
 
     char c;
-    while (in.get(c)) {
+    while (in.get(c)) {     // Going thru all char in the file
+
+        // Getting the index for the hash table
         unsigned char uc = static_cast<unsigned char>(c) - 32;
-        if (uc < NUM_PRINTABLE)
+        if (uc >= 0 && uc < NUM_PRINTABLE)
+            // Increase the freq of that char
             ++freq[uc];
     }
-    in.close();
 }
 
 // <====================== Hash Table Is DONE ======================> //
