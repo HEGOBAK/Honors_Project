@@ -10,10 +10,10 @@
 // <================= START => OPEN FILE  =================> //
 
 // ─── Ask for user input repeatedly until the user provides a valid filename ───
-ifstream openFile() {
+ifstream openFile(const string usage) {
     string filename;
     while (true) {
-        cout << "Enter name of text file to encode: ";
+        cout << "Enter name of text file to " << usage << ": ";
         if (!getline(cin, filename)) {
             // clear error state and retry
             cin.clear();

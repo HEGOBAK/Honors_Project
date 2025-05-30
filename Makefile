@@ -44,6 +44,7 @@ clean:
 # remove only the encoded output file
 clean-output:
 	rm -f output/encodedFile.txt
+	rm -f output/decodedFile.txt
 
 # remove both build+binary AND output file
 clean-all: clean clean-output

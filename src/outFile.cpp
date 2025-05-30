@@ -14,13 +14,14 @@ void outFile(ifstream& in, const string codes[]) {
 	char c;
 	string code;
 	unsigned char uc;
-	int max_bits_per_line = 50;
 	int bits_on_line = 0;
+	const int max_bits_per_line = 50;
 	
     // out will create the file if it doesn't exist
     ofstream out(ENCODED_FILE);
     if (!out) {
         cerr << "Error: could not open " << ENCODED_FILE << " for writing\n";
+        in.close();
         return;
     }
 
@@ -50,5 +51,7 @@ void outFile(ifstream& in, const string codes[]) {
         }
     }	
     cout << "Huffman codes saved to " << ENCODED_FILE << "\n";
+    in.close();
+    out.close();
 	waitForEnter();
 }

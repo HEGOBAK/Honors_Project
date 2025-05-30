@@ -21,6 +21,7 @@ using namespace std;
 // Global Variable
 #define NUM_PRINTABLE 95
 #define ENCODED_FILE "output/encodedFile.txt"
+#define DECODED_FILE "output/decodedFile.txt"
 
 // “SingleNode” holds one character + its frequency (and child pointers) ───
 class SingleNode {
@@ -65,7 +66,7 @@ public:
 };
 
 // ========== huffman.cpp ========== //
-ifstream openFile();
+ifstream openFile(const string usage);
 void countFrequencies(ifstream& in, int hash_table[]);
 void insertSorted(LinkedList*& treeHead, SingleNode* node_toInsert);
 LinkedList* makeLinkedList(int hash_table[]);
@@ -81,8 +82,13 @@ void preorder_display(SingleNode* node, int level);
 void inorder_display(SingleNode* node, int level);
 void postorder_display(SingleNode* node, int level);
 
-// ========== encodeFile.cpp ========== //
+// ========== encode.cpp ========== //
 void encodeFile(SingleNode*& root, int freq[], string codes[]);
+void encodeWord(const string  codes[]);
+
+// ========== decode.cpp ========== //
+void decodeText(SingleNode* root);
+void decodeFile(SingleNode* root);
 
 // ========== printTree.cpp ========== //
 void printTree(SingleNode* root);

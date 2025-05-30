@@ -12,7 +12,7 @@ void printTree(SingleNode* root) {
 	string line;
     while (true) {
         // prompt for traversal order
-        cout << "Select traversal - (I)norder, pr(E)order, po(S)torder: ";
+        cout << "Select traversal - (I)norder, pr(E)order, po(S)torder (or Q to quit): ";
         if (!getline(cin, line)) {
             // I/O error (e.g., EOF), bail out
             cout << "Input error; aborting tree print.\n";
@@ -23,24 +23,21 @@ void printTree(SingleNode* root) {
             continue;
         }
 
+        if (line == "Q" || line == "q") 
+            break;                  // user chose to quit
+
         char choice = toupper(line[0]);  
         if (choice == 'I') {
             cout << "\n--- Inorder (Left-Root-Right) ---\n";
             inorder_display(root, 0);   // print with indentation
-            waitForEnter();
-            break;
         }
         else if (choice == 'E') {
             cout << "\n--- Preorder (Root-Left-Right) ---\n";
             preorder_display(root, 0);
-            waitForEnter();
-            break;
         }
         else if (choice == 'S') {
             cout << "\n--- Postorder (Left-Right-Root) ---\n";
             postorder_display(root, 0);
-            waitForEnter();
-            break;
         }
         else {
             // unrecognized letter

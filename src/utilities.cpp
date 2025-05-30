@@ -88,8 +88,9 @@ void clearState(SingleNode*& root, int freq[], string codes[]) {
         codes[i].clear();
     }
 
-    // delete the output file
+    // delete the I/O file
     remove(ENCODED_FILE);    // From <cstdio>
+    remove(DECODED_FILE);
 }
 
 // ─── Prompt user to Quit (Q/q) or Restart (R/r) ───

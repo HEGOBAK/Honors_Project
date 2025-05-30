@@ -9,11 +9,6 @@
 
 #include "../include/huffman.h"
 
-// --- our menu‐action (Left-Over) ---
-// void encodeWord();
-// void decodeText(SingleNode* root);
-// void decodeFile(SingleNode* root);
-
 int main() {
     int     choice;
     bool    fileEncoded = false;     // This ensure that at least one file has been encoded
@@ -53,10 +48,10 @@ int main() {
                 showCharCode(codes);
                 break;
             case 5:
-                // encodeWord();
+                encodeWord(codes);
                 break;
             case 6:
-                // decodeText(root);
+                decodeText(root);
                 break;
             case 7:
                 if (fileEncoded)
@@ -68,7 +63,7 @@ int main() {
                 fileEncoded = true;
                 break;
             case 8:
-                // decodeFile(root);
+                decodeFile(root);
                 break;
             case 9:
                 if (fileEncoded) {
