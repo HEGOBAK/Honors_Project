@@ -1,34 +1,21 @@
-/* **************************************** */
-/*                                          */
-/*     Project: CIS22C Huffman Encoding     */
-/*     Authors: Jeriel & Chu                */
-/*                                          */
-/* **************************************** */
 
-/* Purpose : Menu + wiring Huffman state through options */
-
-#include "../include/huffman.h"
+#include "Huffman.h"
+using namespace std;
 
 int main() {
-    int     choice;
-    bool    fileEncoded = false;     // This ensure that at least one file has been encoded
-    SingleNode* root      = nullptr;       // Huffman‐tree root
-    int     freq[NUM_PRINTABLE];     // frequency hash table
-    string  codes[NUM_PRINTABLE];    // Huffman code hash table
+    Huffman huff;
+    int choice;
 
     while (true) {
-        
-        // Clear the screen
-        clearScreen();
 
-        // List out the menu 
+        // Clear screen & show menu
+        clearScreen();
         printMenu();
 
-        // Get user's choice
         choice = getMenuChoice();
 
-        // enforce that file must be encoded first
-        if (!fileEncoded && choice != 7 && choice != 9) {
+        // enforce that option 7 (encodeFile) comes before 1..6
+        if (!huff.fileEncoded() && choice != 7 && choice != 9) {
             cout << "⚠  Please choose option 7 first to load & encode a file.\n";
             waitForEnter();
             continue;
@@ -36,47 +23,54 @@ int main() {
 
         switch (choice) {
             case 1:
-                showCharFreq(freq);
+                huff.showCharFreq();
                 break;
+
             case 2:
-                printTree(root);
+                huff.printTree();
                 break;
+
             case 3:
-                printHuffmanCodes(codes);
+                huff.printHuffmanCodes();
                 break;
+
             case 4:
-                showCharCode(codes);
+                huff.showCharCode();
                 break;
+
             case 5:
-                encodeWord(codes);
+                huff.encodeWord();
                 break;
+
             case 6:
-                decodeText(root);
+                huff.decodeText();
                 break;
+
             case 7:
-                if (fileEncoded)
-                {
-                    clearState(root, freq, codes);
-                    fileEncoded = false;
-                }
-                encodeFile(root, freq, codes);
-                fileEncoded = true;
+                huff.encodeFile();
                 break;
+
             case 8:
-                decodeFile(root);
+                huff.decodeFile();
                 break;
+
             case 9:
-                if (fileEncoded) {
-                    clearState(root, freq, codes);
-                    fileEncoded = false;
-                    if (quitting()) return 0;
-                    waitForEnter();
+                if (huff.fileEncoded()) {
+                    bool q = quitting();
+                    if (q) {
+                        return 0;
+                    }
+                    // Restart by clearing existing Huffman state
+                    huff.clearState();
                 }
-                else
+                else {
                     return 0;
+                }
                 break;
+
             default:
                 cout << "Invalid option, please try again.\n";
+                waitForEnter();
                 break;
         }
     }

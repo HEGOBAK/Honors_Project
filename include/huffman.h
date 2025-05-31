@@ -1,10 +1,3 @@
-/* **************************************** */
-/*                                          */
-/*     Project: CIS22C Huffman Encoding     */
-/*     Authors: Jeriel & Chu                */
-/*                                          */
-/* **************************************** */
-
 
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
@@ -12,103 +5,110 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cctype>
-#include <cstdio>
-
-
+#include <cstdio>       // for remove()
+#include "Node.h"
+#include "LinkedList.h"
+#include "Utilities.h"
 using namespace std;
 
-// Global Variable
-#define NUM_PRINTABLE 95
-#define ENCODED_FILE "output/encodedFile.txt"
-#define DECODED_FILE "output/decodedFile.txt"
+// ──────────────────────────────────────────────────────────────────────────
+// The Huffman class encapsulates all state & behavior needed to:
+//   1) read an input file → count frequencies,
+//   2) build a sorted linked list of single‐char SingleNode*,
+//   3) merge into a Huffman tree,
+//   4) generate codes[], 
+//   5) encode/decode text and files,
+//   6) display freq/tree/codes, etc.
+//  
+// ──────────────────────────────────────────────────────────────────────────
 
-// “SingleNode” holds one character + its frequency (and child pointers) ───
-class SingleNode {
+class Huffman {
 public:
-    char          ch;     // the character (only valid in a leaf)
-    int           freq;   // how many times it appeared
-    SingleNode*   leftChild;   // left child in the Huffman tree
-    SingleNode*   rightChild;  // right child in the Huffman tree
-
-    // leaf constructor
-    SingleNode(char c, int f) 
+    // ── Constructor: zero-out freq_[], clear codes_[], set pointers to nullptr ──
+    Huffman()
     {
-        ch = c;
-        freq = f;
-        leftChild = nullptr;
-        rightChild = nullptr;
+        root_ = nullptr;
+        treeHead_ = nullptr;
+        fileEncoded_ = false;
+        for (int i = 0; i < NUM_PRINTABLE; ++i) {
+            freq_[i] = 0;
+            codes_[i].clear();
+        }
     }
 
-    // internal‐node constructor (merging two children)
-    SingleNode(SingleNode* l, SingleNode* r)
+    // ── Destructor: call clearState() to free everything and delete files ──
+    ~Huffman()
     {
-        ch = '\0';
-        freq = (l->freq + r->freq);
-        leftChild = l;
-        rightChild = r;
-        
+        clearState();
     }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Menu‐accessible actions (called by main()):
+    //  1) showCharFreq()
+    //  2) printTree()
+    //  3) printHuffmanCodes()
+    //  4) showCharCode()
+    //  5) encodeWord()
+    //  6) decodeText()
+    //  7) encodeFile()
+    //  8) decodeFile()
+    //  9) (quit/restart is handled in main)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    void showCharFreq() const {showChar(freq_, "Frequency");};         // option 1
+    void printTree() const;            // option 2
+    void printHuffmanCodes() const {hash_display(codes_);};     // option 3
+    void showCharCode() const {showChar(codes_, "Huffman Codes");};         // option 4
+    void encodeWord() const;           // option 5
+    void decodeText() const;           // option 6
+    void encodeFile();                 // option 7
+    void decodeFile() const;           // option 8
+
+    // ── returns true if encodeFile() has been called successfully ──
+    bool fileEncoded() const {return fileEncoded_;}
+	
+	// ──────────────────────────────────────────────────────────────────────────
+    // clearState(): delete the Huffman tree, delete any linked‐list wrappers,
+    // zero out freq_/codes_, remove on-disk files, set fileEncoded_ = false.
+    // ──────────────────────────────────────────────────────────────────────────
+    void clearState();
+
+
+private:
+
+    // ── Private Variables ──
+    int            freq_[NUM_PRINTABLE];   // frequency hash table
+    string         codes_[NUM_PRINTABLE];  // Huffman code hash table
+    SingleNode*    root_;                  // root of the Huffman tree
+    LinkedList*    treeHead_;              // head of the sorted linked list
+    bool           fileEncoded_;
+
+    // ─── File I/O helpers ───
+    ifstream openFile(const string usage) const;                // prompt & open file
+    void     outFile(ifstream& in, const string codes[]) const; // write bits to ENCODED_FILE
+
+    // ─── Frequency counting ───
+    void countFrequencies(ifstream& in);  // fill freq_[]
+
+    // ─── Linked‐list building ───
+    LinkedList* makeLinkedList();                       // build sorted list from freq_[]
+    void        insertSorted(LinkedList*& head,
+                             SingleNode* nodeToInsert); // helper: insert one node
+
+    // ─── Tree merging ───
+    SingleNode* buildTree();  // merge list into a single Huffman tree, return root
+
+    // ─── Code generation ───
+    void generateCodes(SingleNode* node, const string& path); 
+        // recursive: store “0”/“1” paths into codes_[] at leaves
+
+    // ─── Tree deletion ───
+    void deleteTree(SingleNode* node);  // recursively delete all nodes under node
+
+    // ─── Tree display helpers ───
+    void preorder_display(SingleNode* node, int level) const;
+    void inorder_display(SingleNode* node, int level) const;
+    void postorder_display(SingleNode* node, int level) const;
 };
-
-// "LinkedList" is one element of our singly-linked list (the “tree”) ───
-class LinkedList {
-public:
-    SingleNode* characterNode;  // pointer to that one‐character node
-    LinkedList*   next;        // next element in the list
-
-    // Initial constructor
-    LinkedList(SingleNode* temp) 
-    {
-        characterNode = temp;
-        next = nullptr;
-    }
-};
-
-// ========== huffman.cpp ========== //
-ifstream openFile(const string usage);
-void countFrequencies(ifstream& in, int hash_table[]);
-void insertSorted(LinkedList*& treeHead, SingleNode* node_toInsert);
-LinkedList* makeLinkedList(int hash_table[]);
-SingleNode* buildTree(LinkedList*& treeHead);
-void generateCodes(SingleNode* node, const string& path, string codes[]);
-void deleteTree(SingleNode* node);
-
-// ========== display.cpp ========== //
-template<typename T>
-void hash_display(const T table[]);
-void linkedList_display(LinkedList* treeHead);
-void preorder_display(SingleNode* node, int level);
-void inorder_display(SingleNode* node, int level);
-void postorder_display(SingleNode* node, int level);
-
-// ========== encode.cpp ========== //
-void encodeFile(SingleNode*& root, int freq[], string codes[]);
-void encodeWord(const string  codes[]);
-
-// ========== decode.cpp ========== //
-void decodeText(SingleNode* root);
-void decodeFile(SingleNode* root);
-
-// ========== printTree.cpp ========== //
-void printTree(SingleNode* root);
-
-// ========== showChar.cpp ========== //
-template<typename T>
-void showChar(const T table[], const string output);
-
-// ========== outFile.cpp ========== //
-void outFile(ifstream& in, const string codes[]);
-
-// ========== utilities.cpp ========== //
-void printMenu();
-int getMenuChoice();
-void showCharFreq(const int freq[]);
-void showCharCode(const string codes[]);
-void printHuffmanCodes(const string codes[]);
-void clearState(SingleNode*& root, int freq[], string codes[]);
-bool quitting();
-void clearScreen();
-void waitForEnter();
 
 #endif // HUFFMAN_H

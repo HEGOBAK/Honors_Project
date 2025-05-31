@@ -26,7 +26,7 @@ We provide a simple Makefile so you don’t have to type long compile commands.
 
 **How to use**  
 - make -- compile everything and create an exe name "huffman"
-- make clean -- deletes everything
+- make clean-all -- deletes everything
 - make re -- make clean then make
 
 

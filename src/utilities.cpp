@@ -1,13 +1,10 @@
-/* **************************************** */
-/*                                          */
-/*     Project: CIS22C Huffman Encoding     */
-/*     Authors: Jeriel & Chu                */
-/*                                          */
-/* **************************************** */
 
-#include "../include/huffman.h"
+#include "Utilities.h"
+#include <limits>   // for numeric_limits
 
-// ─── Print menu ───
+// ──────────────────────────────────────────────────────────────────────────
+// printMenu: displays the main menu choices
+// ──────────────────────────────────────────────────────────────────────────
 void printMenu() {
     cout << "\n========================================\n";
     cout << "       Huffman Encoding Main Menu      \n";
@@ -24,30 +21,31 @@ void printMenu() {
     cout << "========================================\n";
 }
 
-// ─── Prompt until the user picks a valid option (1–9) ───
+// ──────────────────────────────────────────────────────────────────────────
+// getMenuChoice: prompt until user enters a valid option
+// ──────────────────────────────────────────────────────────────────────────
 int getMenuChoice() {
     string line;
     int choice;
     while (true) {
         cout << "Select an option (1-9): ";
         if (!getline(cin, line)) {
-            // input error, clear state and retry
+            // clear error state and retry
             cin.clear();
             continue;
         }
         if (line.empty()) {
-			// input empty just continue
+            // input empty, retry
             continue;
         }
-		// attempt to convert the input string to an integer
         try {
             choice = stoi(line);
-        } catch (...) {
-			// non‐numeric input: ask again
+        }
+        catch (...) {
+            // non‐numeric input
             cout << "Invalid input; please enter a number between 1 and 9.\n";
             continue;
         }
-		// ensure the choice is within the valid menu range
         if (choice < 1 || choice > 9) {
             cout << "Please enter a number between 1 and 9.\n";
             continue;
@@ -56,77 +54,161 @@ int getMenuChoice() {
     }
 }
 
-// ─── Print out each character's frequency ───
+// ──────────────────────────────────────────────────────────────────────────
+// showCharFreq: wrapper to call showChar<int>                    (option 1)
+// ──────────────────────────────────────────────────────────────────────────
 void showCharFreq(const int freq[]) {
-	showChar(freq, "Frequency");
+    showChar(freq, "Frequency");
 }
 
-// ─── Print out each character's Huffman Code ───
+// ──────────────────────────────────────────────────────────────────────────
+// showCharCode: wrapper to call showChar<string>                  (option 4)
+// ──────────────────────────────────────────────────────────────────────────
 void showCharCode(const string codes[]) {
-	showChar(codes, "Huffman Codes");
+    showChar(codes, "Huffman Codes");
 }
 
-
-// ─── Print out each character's Huffman code ───
+// ──────────────────────────────────────────────────────────────────────────
+// printHuffmanCodes: wrapper to call hash_display<string>         (option 3)
+// ──────────────────────────────────────────────────────────────────────────
 void printHuffmanCodes(const string codes[]) {
-	hash_display(codes);
+    hash_display(codes);
 }
 
-// ─── Reset all of our Huffman state ───
-void clearState(SingleNode*& root, int freq[], string codes[]) {
-    // free any existing tree
-    if (root) {
-        deleteTree(root);
-        root = nullptr;
-    }
-    // zero out the frequency table
-    for (int i = 0; i < NUM_PRINTABLE; ++i) {
-        freq[i] = 0;
-    }
-    // clear all the code strings
-    for (int i = 0; i < NUM_PRINTABLE; ++i) {
-        codes[i].clear();
-    }
-
-    // delete the I/O file
-    remove(ENCODED_FILE);    // From <cstdio>
-    remove(DECODED_FILE);
-}
-
-// ─── Prompt user to Quit (Q/q) or Restart (R/r) ───
+// ──────────────────────────────────────────────────────────────────────────
+// quitting: prompt for Q or R (matches your original).               
+// ──────────────────────────────────────────────────────────────────────────
 bool quitting() {
     string line;
     while (true) {
         cout << "Enter 'Q' to quit or 'R' to restart: ";
         if (!getline(cin, line)) {
-            // I/O error: clear and retry
+            // I/O error, retry
             cin.clear();
             continue;
         }
         if (line.empty()) {
-            // input empty just continue
             continue;
         }
-
         char c = line[0];
         if (c == 'q' || c == 'Q') {
-            return true;    // user chose to quit
+            return true;
         }
         if (c == 'r' || c == 'R') {
-            return false;   // user chose to restart
+            return false;
         }
         cout << "Invalid input. Please enter Q or R.\n";
     }
 }
 
-// ─── Clear the terminal (ANSI escape sequence) ───
+// ──────────────────────────────────────────────────────────────────────────
+// clearScreen: ANSI escape to clear screen                             
+// ──────────────────────────────────────────────────────────────────────────
 void clearScreen() {
-    // 2J clears the screen, H moves cursor to home
     cout << "\033[2J\033[H";
 }
 
-// wait for the user to hit ENTER
+// ──────────────────────────────────────────────────────────────────────────
+// waitForEnter: pause until user hits ENTER                            
+// ──────────────────────────────────────────────────────────────────────────
 void waitForEnter() {
     cout << "\n(Press ENTER to continue)";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// showChar<T>: prompt user for a single character, then print
+// ──────────────────────────────────────────────────────────────────────────
+template<typename T>
+void showChar(const T table[], const string output) {
+    string line;
+    char ch;
+    unsigned char uc;
+
+    // keep prompting until we get a printable ASCII character or Q
+    while (true) {
+        cout << "Enter a single character : ";
+        if (!getline(cin, line)) {
+            // I/O error: retry
+            cin.clear();
+            continue;
+        }
+        if (line.empty()) {
+            continue;
+        }
+
+        ch = line[0];
+        uc = static_cast<unsigned char>(ch);
+
+        // check printable ASCII range
+        if (uc < 32 || uc > 126) {
+            cout << "Character out of printable ASCII range (32-126). Please try again.\n";
+            continue;
+        }
+
+        int idx = uc - 32;
+        // compare table[idx] to default T() to test “empty”
+        if (table[idx] == T()) {
+            cout << "Character '" << ch << "' not found.\n";
+        }
+        else {
+            cout << output << " for '" << ch << "' is: " << table[idx] << "\n";
+        }
+
+		cout << "\n(Press Q to return to the menu, or any other key to look up again) : ";
+		if (!getline(cin, line)) {
+            // I/O error: retry
+            cin.clear();
+            continue;
+        }
+        if (line.empty()) {
+            continue;
+        }
+		if (line[0] == 'Q' || line[0] == 'q')
+			break;
+    }
+}
+
+// explicitly instantiate so linker finds them
+template void showChar<int>(const int[], const string);
+template void showChar<string>(const string[], const string);
+
+// ──────────────────────────────────────────────────────────────────────────
+// hash_display<T>: print hash table
+// ──────────────────────────────────────────────────────────────────────────
+template<typename T>
+void hash_display(const T table[]) {
+    int printed = 0;          // how many entries we've printed
+    const int perLine = 10;
+    char ch;
+
+    cout << "\n <========= Hash Table =========> \n";
+    for (int i = 0; i < NUM_PRINTABLE; ++i) {
+        // skip “empty”: T() is 0 for int, "" for string
+        if (table[i] == T()) continue;
+
+        if (printed % perLine == 0) {
+            cout << "|  ";
+        }
+
+        ch = static_cast<char>(i + 32);
+        cout << ch << "-" << "[" << table[i] << "]";
+        printed++;
+
+        if (printed % perLine == 0) {
+            cout << " |\n";
+        }
+        else {
+            cout << "  ";
+        }
+    }
+    if (printed % perLine != 0) {
+        cout << "|\n";
+    }
+    waitForEnter();
+}
+
+// explicitly instantiate so linker finds them
+template void hash_display<int>(const int[]);
+template void hash_display<string>(const string[]);
+
