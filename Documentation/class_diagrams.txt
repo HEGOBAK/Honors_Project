@@ -1,0 +1,72 @@
+┌─────────────────────────────────────────────────────────────────┐
+│                            Huffman                             │
+├─────────────────────────────────────────────────────────────────┤
+│ – freq_ : int[NUM_PRINTABLE]            (stores character counts)    │
+│ – codes_: string[NUM_PRINTABLE]         (Huffman code for each char)  │
+│ – root_ : SingleNode*                   (pointer to Huffman tree root) │
+│ – treeHead_ : LinkedList*               (head of sorted linked list)   │
+│ – fileEncoded_ : bool                   (flag: has encodeFile run?)     │
+├─────────────────────────────────────────────────────────────────┤
+│ + Huffman()                             (constructor)                 │
+│ + ~Huffman()                            (destructor → clearState)      │
+│ + showCharFreq() : void                (wrapper: showChar(freq_,…))    │
+│ + printTree()    : void                (prompt & display tree)         │
+│ + printHuffmanCodes(): void            (wrapper: hash_display(codes_)) │
+│ + showCharCode() : void                (wrapper: showChar(codes_,…))    │
+│ + encodeWord()   : void                (encode a console word)         │
+│ + decodeText()   : void                (decode a Huffman bitstring)    │
+│ + encodeFile()   : void                (read file→count→tree→encode)    │
+│ + decodeFile()   : void                (read encoded file → decode)     │
+│ – clearState()   : void                (free tree/list, zero arrays)    │
+│ – openFile(usage: string): ifstream    (prompt & open text file)        │
+│ – outFile(in: ifstream&, codes: string[]): void  (output bits)   │
+│ – countFrequencies(in: ifstream&): void (fill freq_[])                 │
+│ – makeLinkedList(): LinkedList*         (build sorted list from freq_)  │
+│ – insertSorted(head: LinkedList*&, node: SingleNode*): void (helper)   │
+│ – buildTree(): SingleNode*              (merge list into Huffman tree)  │
+│ – generateCodes(node: SingleNode*, path: string&): void (recursive)    │
+│ – deleteTree(node: SingleNode*): void   (recursively free tree)         │
+│ – preorder_display(node: SingleNode*, level: int): void                 │
+│ – inorder_display(node: SingleNode*, level: int): void                  │
+│ – postorder_display(node: SingleNode*, level: int): void                 │
+└─────────────────────────────────────────────────────────────────┘
+           ▲
+           │ uses/composes
+┌─────────────────────────────────────────────────────────────────┐
+│                          SingleNode                            │
+├─────────────────────────────────────────────────────────────────┤
+│ – ch         : char         (only valid in leaf nodes)           │
+│ – freq       : int          (frequency count or sum)             │
+│ – leftChild  : SingleNode*  (nullptr if leaf)                    │
+│ – rightChild : SingleNode*  (nullptr if leaf)                    │
+├─────────────────────────────────────────────────────────────────┤
+│ + SingleNode(c: char, f: int)             (leaf constructor)     │
+│ + SingleNode(l: SingleNode*, r: SingleNode*) (internal constructor) │
+└─────────────────────────────────────────────────────────────────┘
+
+           ▲
+           │ wraps
+┌─────────────────────────────────────────────────────────────────┐
+│                          LinkedList                            │
+├─────────────────────────────────────────────────────────────────┤
+│ – characterNode : SingleNode*    (points to a leaf or merged node) │
+│ – next          : LinkedList*    (next element in sorted list)      │
+├─────────────────────────────────────────────────────────────────┤
+│ + LinkedList(temp: SingleNode*)   (constructor wraps a SingleNode)  │
+└─────────────────────────────────────────────────────────────────┘
+
+─────────── uses (calls) ──────────►  
+┌─────────────────────────────────────────────────────────────────┐
+│                       Utilities (namespace)                    │
+├─────────────────────────────────────────────────────────────────┤
+│ + printMenu()              : void     (display main menu)       │
+│ + getMenuChoice()          : int      (prompt 1–9)               │
+│ + showCharFreq(freq: int[]) : void    (wrapper → showChar(int))  │
+│ + showCharCode(codes: string[]) : void (wrapper → showChar(string)) │
+│ + printHuffmanCodes(codes: string[]) : void (wrapper → hash_display)│
+│ + quitting()               : bool    (prompt Q/R)                │
+│ + clearScreen()            : void    (ANSI clear)                │
+│ + waitForEnter()           : void    (pause on ENTER)            │
+│ + showChar<T>(table: T[], output: string) : void (display one char)│
+│ + hash_display<T>(table: T[])  : void (print nonempty entries)    │
+└─────────────────────────────────────────────────────────────────┘

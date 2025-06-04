@@ -1,0 +1,13 @@
+Plain-Text File Compression
+When you save a .txt file in many zip or compression utilities, the program often applies a basic Huffman‐coding step.
+For example, if a text document has many repeated letters (like “e” or “t”), Huffman replaces them with shorter bit patterns. 
+This reduces the overall file size so you can send or store the text more efficiently.
+
+Prefix-Code Encoding in a Text-Based Game or Chat App
+If you write a simple chat program or a text-only game that runs over a slow network (say a BASIC terminal connection), 
+you could assign common letters (like space, “e”, “t”) very short bit codes. Every message the user sends is first Huffman-encoded before 
+transmission and then decoded on the other side. This means fewer bits on the wire and faster updates in a low-bandwidth environment.
+
+Reducing Size of Email Attachments (Basic Archive Formats)
+Even before full “.zip” or “.rar” formats, some simple archive tools apply Huffman coding to group of files. For example, an email client 
+that bundles several .csv or .log files might run a quick Huffman step over each file’s contents so the total attachment is smaller.

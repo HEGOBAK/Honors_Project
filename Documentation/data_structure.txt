@@ -1,0 +1,60 @@
+┌─────────────────────────────────────────────────────────────────┐
+│                          freq_[0..94]                          │
+│   (int array, indexed by ASCII code – 32)                       │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Example:                                                  │  │
+│  │   freq_['A' - 32] =  5  │ freq_['B' - 32] = 3             │  │
+│  │   freq_['C' - 32] =  2  │ freq_['D' - 32] = 1             │  │
+│  │   … all other printable ASCII characters …                │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                  │
+                  │  (for each freq_[i] > 0 create a leaf SingleNode)
+                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        LinkedList Chain                        │
+│  (sorted by leaf-node→freq in ascending order)                 │
+│                                                                 │
+│   head_ ─► [ characterNode = SingleNode('D',1) ] ─► [ … ] ─► …  │
+│           │ next                                         next │
+│           ▼                                                    │
+│   [ characterNode = SingleNode('C',2) ]                        │
+│           │ next                                                │
+│           ▼                                                    │
+│   [ characterNode = SingleNode('B',3) ]                        │
+│           │ next                                                │
+│           ▼                                                    │
+│   [ characterNode = SingleNode('A',5) ]   (tail)                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                  │
+                  │  (buildTree: pop two smallest, merge, reinsert, repeat)
+                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        Huffman Binary Tree                     │
+│                                                                 │
+│               ┌────────────────────────────┐                    │
+│               │ InternalNode(freq=11)      │  ← root_           │
+│               │ (no char stored)           │                    │
+│               └────────────────────────────┘                    │
+│                      /                  \                       │
+│     ┌────────────────┘                    └─────────────┐       │
+│     │                                                  │       │
+│ ┌───────────────┐                                 ┌──────────┐  │
+│ │InternalNode(6)│                                 │ Leaf('A',5) │ │
+│ │(no char)      │                                 └──────────┘  │
+│ └───────────────┘                                         ╱      │
+│       /       \                                           ╱      │
+│ ┌───────────┐ ┌───────────┐                              ╱       │
+│ │Leaf('C',2)│ │Leaf('B',3)│                            ╱         │
+│ └───────────┘ └───────────┘                        ┌──────────┐  │
+│                                                  │(other sub)│  │
+│                                                  └──────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+Legend:
+ • freq_ array feeds into a sorted singly linked list of LinkedList nodes, each wrapping a leaf SingleNode(c, freq).
+ • buildTree() repeatedly pops the two lowest‐frequency SingleNode leaves, merges them into a new Internal SingleNode, then reinserts into the linked list until only one node (the root_) remains.
+ • generateCodes(root_, "") then does a preorder walk to assign a binary string to each leaf.

@@ -1,0 +1,61 @@
+main()
+  ├─ clearScreen()
+  ├─ printMenu()
+  ├─ choice ← getMenuChoice()
+  ├─ if (!huff.fileEncoded() && choice not in {7, 9})
+  │     └─ print warning, waitForEnter(), goto start of while
+  ├─ switch(choice)
+  │     ├─ case 1:   huff.showCharFreq()
+  │     │    └─ showChar(freq_, “Frequency”)
+  │     │         └─ showChar<int>(…)
+  │     ├─ case 2:   huff.printTree()
+  │     │    ├─ if (!root_) report error
+  │     │    ├─ prompt traversal choice
+  │     │    ├─ inorder, preorder, or postorder display
+  │     │    │    └─ inorder_display(root_, 0)  (or other)
+  │     │    └─ waitForEnter()
+  │     ├─ case 3:   huff.printHuffmanCodes()
+  │     │    └─ hash_display(codes_)
+  │     ├─ case 4:   huff.showCharCode()
+  │     │    └─ showChar(codes_, “Huffman Codes”)
+  │     ├─ case 5:   huff.encodeWord()
+  │     │    ├─ if (!fileEncoded_) report error, waitForEnter()
+  │     │    ├─ prompt word
+  │     │    ├─ for each char in word
+  │     │    │    ├─ check valid ASCII & code exists
+  │     │    │    ├─ build Huffman bit‐string & ASCII representation
+  │     │    ├─ print results
+  │     │    └─ wait for Q to return
+  │     ├─ case 6:   huff.decodeText()
+  │     │    ├─ if (!fileEncoded_) error, waitForEnter()
+  │     │    ├─ prompt bit‐string
+  │     │    ├─ for each bit in input
+  │     │    │    ├─ traverse tree (leftChild/rightChild)
+  │     │    │    ├─ if leaf → append character to decoded string
+  │     │    ├─ print decoded text
+  │     │    └─ wait for Q to return
+  │     ├─ case 7:   huff.encodeFile()
+  │     │    ├─ if (fileEncoded_) huff.clearState()
+  │     │    ├─ in ← openFile("encode")
+  │     │    ├─ countFrequencies(in)
+  │     │    ├─ treeHead_ ← makeLinkedList()
+  │     │    ├─ root_ ← buildTree()
+  │     │    ├─ generateCodes(root_, "")
+  │     │    ├─ outFile(in, codes_)
+  │     │    ├─ in.close(), fileEncoded_ ← true
+  │     │    └─ waitForEnter()
+  │     ├─ case 8:   huff.decodeFile()
+  │     │    ├─ if (!root_) error, waitForEnter()
+  │     │    ├─ in ← openFile("decode")
+  │     │    ├─ out ← open(DECODED_FILE)
+  │     │    ├─ curr ← root_
+  │     │    ├─ while (in.get(bit))
+  │     │    │    ├─ if bit not '0' or '1' continue
+  │     │    │    ├─ if '0' → curr ← curr→leftChild else → curr→rightChild
+  │     │    │    ├─ if curr is leaf → out.put(curr→ch); curr ← root_
+  │     │    ├─ in.close(), out.close(), waitForEnter()
+  │     └─ case 9:   if (huff.fileEncoded())
+  │                   ├─ q ← quitting()
+  │                   ├─ if (q) exit(0) else huff.clearState()
+  │                   └─ return to top of while
+  └─ (loop back to start of while)

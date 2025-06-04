@@ -1,0 +1,8 @@
+We held weekly virtual meetings to assign tasks, review each other’s code, and merge branches in a shared Git repository. 
+
+One of our hardest bugs occurred when merging two SingleNode objects into a new internal node. We discovered after several 
+test runs that our insertSorted logic was not maintaining strict ascending order when two nodes had equal frequency. 
+As a result, the order of merging changed and produced a different Huffman tree (still valid but inconsistent codes). 
+We fixed this by adjusting the comparison in insertSorted so that if frequencies are equal, we compare characters 
+(or simply decide to insert new nodes after existing ones). After that change, tests for sample inputs consistently 
+produced the same codes.

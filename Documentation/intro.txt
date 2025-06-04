@@ -1,0 +1,7 @@
+In this project we implement a full Huffman‐encoding system in C++ that can read an input text file, count character frequencies, 
+build a Huffman tree, generate variable‐length codes for each printable character, and then encode or decode files or text. 
+Users interact via a console menu to choose among nine options: display character frequencies, print the Huffman tree in different 
+traversal orders, list all Huffman codes, look up an individual character’s code, encode a word or entire file, 
+decode an input bit‐string or an encoded file, and quit or restart. The goal is to demonstrate how Huffman’s greedy algorithm constructs 
+an optimal prefix code for lossless data compression.
+

@@ -1,0 +1,23 @@
+In this project, we built a Huffman‐encoding system in C++ from scratch. First, we read an input file and counted how often each printable 
+ASCII character appeared, storing those counts in an array indexed by (ASCII − 32). Next, we created a sorted linked list of leaf nodes—one 
+for each character with nonzero frequency—and repeatedly merged the two lowest‐frequency nodes into a new internal node until a 
+single Huffman tree remained. From that tree, we generated prefix codes by traversing left (0) and right (1) paths, saving each 
+character’s bit‐string in a codes_ array. Finally, we rewound the input file to encode it—writing ASCII ‘0’/‘1’ bits, 50 per line—or 
+decoded any encoded file by walking bits through the same tree.
+
+We also added menu options so that users can display character frequencies, print the tree in inorder, preorder, or postorder, 
+look up an individual character’s code, and enforce that “encode file first” before any lookup or decode. Memory management was 
+handled in a clearState() routine that deletes every tree node and any leftover linked‐list node, zeroes out the frequency and 
+code arrays, removes on‐disk files, and resets a flag so the program can start fresh. The project is organized into separate modules: 
+a Huffman class for core logic, Node.h and LinkedList.h for data structures, Utilities.h for menu and display helpers, and main.cpp for the user interface.
+
+• We counted frequencies into freq_[ ] using (ASCII − 32) as the key
+• We built a sorted linked list of SingleNode leaves and merged them step by step into the Huffman tree
+• We generated each leaf’s code via recursive traversal, passing a “path” string down to leaves (left → ‘0’, right → ‘1’)
+• To encode, we read each printable character again, looked up its code, and wrote bits to output/encodedFile.txt
+• To decode, we read each bit, traversed the tree until reaching a leaf, and wrote that character to output/decodedFile.txt
+• Menu actions include showing frequencies, printing the tree, listing all codes, and looking up one character’s code
+• In clearState(), we delete the entire tree, delete any remaining linked‐list wrappers, zero out arrays, remove the encoded/decoded files, and reset the fileEncoded_ flag
+• Template functions (showChar<T> and hash_display<T>) let us inspect both integer frequency arrays and string code arrays in a uniform way
+• We handle invalid inputs—like file errors, bad menu choices, or invalid bits—by printing clear error messages and pausing for the user to press Enter
+• The code is organized into separate modules: the Huffman class (core logic), Node/LinkedList headers (data structures), Utilities (menu/display), and main.cpp (console loop and user interface)
