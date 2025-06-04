@@ -43,7 +43,7 @@ public:
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // Menu‐accessible actions (called by main()):
+    // Menu actions (called by main()):
     //  1) showCharFreq()
     //  2) printTree()
     //  3) printHuffmanCodes()
