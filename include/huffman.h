@@ -23,6 +23,42 @@ using namespace std;
 // ──────────────────────────────────────────────────────────────────────────
 
 class Huffman {
+private:
+
+    // ── Private Variables ──
+    int            freq_[NUM_PRINTABLE];   // frequency hash table
+    string         codes_[NUM_PRINTABLE];  // Huffman code hash table
+    SingleNode*    root_;                  // root of the Huffman tree
+    LinkedList*    treeHead_;              // head of the sorted linked list
+    bool           fileEncoded_;
+
+    // ─── File I/O helpers ───
+    ifstream openFile(const string usage) const;                // prompt & open file
+    void     outFile(ifstream& in, const string codes[]) const; // write bits to ENCODED_FILE
+
+    // ─── Frequency counting ───
+    void countFrequencies(ifstream& in);  // fill freq_[]
+
+    // ─── Linked‐list building ───
+    LinkedList* makeLinkedList();                       // build sorted list from freq_[]
+    void        insertSorted(LinkedList*& head,
+                             SingleNode* nodeToInsert); // helper: insert one node
+
+    // ─── Tree merging ───
+    SingleNode* buildTree();  // merge list into a single Huffman tree, return root
+
+    // ─── Code generation ───
+    void generateCodes(SingleNode* node, const string& path); 
+        // recursive: store “0”/“1” paths into codes_[] at leaves
+
+    // ─── Tree deletion ───
+    void deleteTree(SingleNode* node);  // recursively delete all nodes under node
+
+    // ─── Tree display helpers ───
+    void preorder_display(SingleNode* node, int level) const;
+    void inorder_display(SingleNode* node, int level) const;
+    void postorder_display(SingleNode* node, int level) const;
+
 public:
     // ── Constructor: zero-out freq_[], clear codes_[], set pointers to nullptr ──
     Huffman()
@@ -32,7 +68,7 @@ public:
         fileEncoded_ = false;
         for (int i = 0; i < NUM_PRINTABLE; ++i) {
             freq_[i] = 0;
-            codes_[i].clear();
+            codes_[i] = "";
         }
     }
 
@@ -72,43 +108,6 @@ public:
     // zero out freq_/codes_, remove on-disk files, set fileEncoded_ = false.
     // ──────────────────────────────────────────────────────────────────────────
     void clearState();
-
-
-private:
-
-    // ── Private Variables ──
-    int            freq_[NUM_PRINTABLE];   // frequency hash table
-    string         codes_[NUM_PRINTABLE];  // Huffman code hash table
-    SingleNode*    root_;                  // root of the Huffman tree
-    LinkedList*    treeHead_;              // head of the sorted linked list
-    bool           fileEncoded_;
-
-    // ─── File I/O helpers ───
-    ifstream openFile(const string usage) const;                // prompt & open file
-    void     outFile(ifstream& in, const string codes[]) const; // write bits to ENCODED_FILE
-
-    // ─── Frequency counting ───
-    void countFrequencies(ifstream& in);  // fill freq_[]
-
-    // ─── Linked‐list building ───
-    LinkedList* makeLinkedList();                       // build sorted list from freq_[]
-    void        insertSorted(LinkedList*& head,
-                             SingleNode* nodeToInsert); // helper: insert one node
-
-    // ─── Tree merging ───
-    SingleNode* buildTree();  // merge list into a single Huffman tree, return root
-
-    // ─── Code generation ───
-    void generateCodes(SingleNode* node, const string& path); 
-        // recursive: store “0”/“1” paths into codes_[] at leaves
-
-    // ─── Tree deletion ───
-    void deleteTree(SingleNode* node);  // recursively delete all nodes under node
-
-    // ─── Tree display helpers ───
-    void preorder_display(SingleNode* node, int level) const;
-    void inorder_display(SingleNode* node, int level) const;
-    void postorder_display(SingleNode* node, int level) const;
 };
 
 #endif // HUFFMAN_H
