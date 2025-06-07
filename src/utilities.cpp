@@ -55,27 +55,6 @@ int getMenuChoice() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// showCharFreq: wrapper to call showChar<int>                    (option 1)
-// ──────────────────────────────────────────────────────────────────────────
-void showCharFreq(const int freq[]) {
-    showChar(freq, "Frequency");
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// showCharCode: wrapper to call showChar<string>                  (option 4)
-// ──────────────────────────────────────────────────────────────────────────
-void showCharCode(const string codes[]) {
-    showChar(codes, "Huffman Codes");
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// printHuffmanCodes: wrapper to call hash_display<string>         (option 3)
-// ──────────────────────────────────────────────────────────────────────────
-void printHuffmanCodes(const string codes[]) {
-    hash_display(codes);
-}
-
-// ──────────────────────────────────────────────────────────────────────────
 // quitting: prompt for Q or R (matches your original).               
 // ──────────────────────────────────────────────────────────────────────────
 bool quitting() {
@@ -134,6 +113,11 @@ void showChar(const T table[], const string output) {
             continue;
         }
         if (line.empty()) {
+            continue;
+        }
+        // reject if more than one character was entered
+        if (line.size() != 1) {
+            cout << "Please enter exactly one character.\n";
             continue;
         }
 
