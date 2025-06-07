@@ -197,7 +197,7 @@ SingleNode* Huffman::buildTree()
         // pop left
         SingleNode* leftNode = treeHead_->characterNode;
         LinkedList* t1 = treeHead_;
-        treeHead_ = treeHead_->next;
+        treeHead_ = treeHead_->next; // remove node from LinkedList
         delete t1;
 
         // pop right
