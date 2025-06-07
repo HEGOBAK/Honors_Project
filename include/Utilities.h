@@ -12,6 +12,7 @@ using namespace std;
 // constants for file names
 #define ENCODED_FILE  "output/encodedFile.txt"
 #define DECODED_FILE  "output/decodedFile.txt"
+#define TEST_FILE 	  "tests/"
 
 // ──────────────────────────────────────────────────────────────────────────
 // printMenu: displays the main menu choices

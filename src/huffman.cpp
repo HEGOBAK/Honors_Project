@@ -48,20 +48,19 @@ ifstream Huffman::openFile(const string usage) const
 {
     string filename;
     while (true) {
-        cout << "Enter name of text file to " << usage << ": ";
+        cout << "Enter name of text file to " << usage << " (or Q to quit): ";
         if (!getline(cin, filename)) {    // read input
             cin.clear();
             continue;
         }
-        // try current directory
-        ifstream in(filename);
-        if (in) {
-            cout << "Opened \"" << filename << "\" successfully.\n";
-            waitForEnter();
-            return in;
+
+        // user asked to quit
+        if (!filename.empty() && (filename[0] == 'Q' || filename[0] == 'q')) {
+            return ifstream("");   // return a stream bound to "", which will fail immediately
         }
-        // try “tests/” subfolder
-        string alt = "tests/" + filename;
+
+        // try opening the file at TEST_FILE
+        string alt = TEST_FILE + filename;
         ifstream in2(alt);
         if (in2) {
             cout << "Opened \"" << alt << "\" successfully.\n";
