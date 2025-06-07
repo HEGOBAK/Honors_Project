@@ -58,6 +58,7 @@ private:
     void preorder_display(SingleNode* node, int level) const;
     void inorder_display(SingleNode* node, int level) const;
     void postorder_display(SingleNode* node, int level) const;
+    void reverseInorder_display(SingleNode* node, int level) const;
 
 public:
     // ── Constructor: zero-out freq_[], clear codes_[], set pointers to nullptr ──

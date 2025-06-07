@@ -3,6 +3,9 @@
 #include <cstdio>   // for remove()
 using namespace std;
 
+// Helper to identify leaf nodes
+bool isLeaf(SingleNode* node);
+
 // ──────────────────────────────────────────────────────────────────────────
 // clearState: frees any existing tree, deletes linked‐list wrappers,
 //             zeroes freq_[] and codes_[], removes on‐disk files,
@@ -46,7 +49,7 @@ ifstream Huffman::openFile(const string usage) const
     string filename;
     while (true) {
         cout << "Enter name of text file to " << usage << ": ";
-        if (!getline(cin, filename)) {
+        if (!getline(cin, filename)) {    // read input
             cin.clear();
             continue;
         }
@@ -81,6 +84,7 @@ void Huffman::outFile(ifstream& in, const string codes[]) const
     int bits_on_line = 0;
     const int max_bits_per_line = 50;
 
+    // Open output file for encoded bits
     ofstream out(ENCODED_FILE);
     if (!out) {
         cerr << "Error: could not open " << ENCODED_FILE << " for writing\n";
@@ -92,6 +96,7 @@ void Huffman::outFile(ifstream& in, const string codes[]) const
     in.clear();
     in.seekg(0);
 
+    // Read each character, output its code bits
     while (in.get(c)) {
         uc = static_cast<unsigned char>(c);
         // only printable ASCII (32..126)
@@ -102,7 +107,7 @@ void Huffman::outFile(ifstream& in, const string codes[]) const
         for (char bit : code) {
             out.put(bit);
             bits_on_line++;
-            if (bits_on_line >= max_bits_per_line) {
+            if (bits_on_line >= max_bits_per_line) { // wrap every max_bits_per_line (50) bits
                 out.put('\n');
                 bits_on_line = 0;
             }
@@ -127,6 +132,7 @@ void Huffman::countFrequencies(ifstream& in)
     }
 
     char c;
+    // Count each printable character
     while (in.get(c)) {
         unsigned char uc = static_cast<unsigned char>(c);
         if (uc >= 32 && uc <= 126) {
@@ -145,7 +151,7 @@ LinkedList* Huffman::makeLinkedList()
 {
     LinkedList* head = nullptr;
     for (int i = 0; i < NUM_PRINTABLE; ++i) {
-        if (freq_[i] > 0) {
+        if (freq_[i] > 0) {    // Build linked list of leaves with non-zero freq
             // create a leaf‐node
             SingleNode* leaf = new SingleNode(static_cast<char>(i + 32), freq_[i]);
             insertSorted(head, leaf);
@@ -156,19 +162,23 @@ LinkedList* Huffman::makeLinkedList()
 
 void Huffman::insertSorted(LinkedList*& head, SingleNode* nodeToInsert)
 {
+    // Create new wrapper
     LinkedList* newNode = new LinkedList(nodeToInsert);
 
-    // empty list or smaller than head?
+    // Insert at front if empty or smaller freq
     if (!head || nodeToInsert->freq < head->characterNode->freq) {
         newNode->next = head;
         head = newNode;
         return;
     }
 
+    // Find insertion point
     LinkedList* cur = head;
     while (cur->next && cur->next->characterNode->freq <= nodeToInsert->freq) {
         cur = cur->next;
     }
+
+    // Insert
     newNode->next = cur->next;
     cur->next = newNode;
 }
@@ -182,6 +192,7 @@ void Huffman::insertSorted(LinkedList*& head, SingleNode* nodeToInsert)
 // ──────────────────────────────────────────────────────────────────────────
 SingleNode* Huffman::buildTree()
 {
+    // Merge until one node remains
     while (treeHead_ && treeHead_->next) {
         // pop left
         SingleNode* leftNode = treeHead_->characterNode;
@@ -213,12 +224,13 @@ void Huffman::generateCodes(SingleNode* node, const string& path)
 {
     if (!node) return;
 
-    if (!node->leftChild && !node->rightChild) {
+    if (isLeaf(node)) {
         // leaf: store its code
         unsigned char uc = static_cast<unsigned char>(node->ch);
         codes_[uc - 32] = path;
     }
     else {
+        // Traverse left (0) then right (1)
         generateCodes(node->leftChild,  path + '0');
         generateCodes(node->rightChild, path + '1');
     }
@@ -231,6 +243,7 @@ void Huffman::generateCodes(SingleNode* node, const string& path)
 void Huffman::deleteTree(SingleNode* node)
 {
     if (!node) return;
+    // Recursively delete children
     deleteTree(node->leftChild);
     deleteTree(node->rightChild);
     delete node;
@@ -250,10 +263,12 @@ void Huffman::deleteTree(SingleNode* node)
 // ──────────────────────────────────────────────────────────────────────────
 void Huffman::encodeFile()
 {
+    // Reset if already encoded
     if (fileEncoded_) {
         clearState();
     }
 
+    // Open input
     ifstream in = openFile("encode");
     if (!in) return;
 
@@ -290,6 +305,7 @@ void Huffman::decodeFile() const
         return;
     }
 
+    // Open encoded file
     ifstream in = openFile("decode");
     if (!in) return;
 
@@ -305,6 +321,7 @@ void Huffman::decodeFile() const
     int chars_on_line = 0;
     const int max_chars_per_line = 50;
 
+    // Read bit-by-bit
     while (in.get(bit)) {
         // skip anything but '0' or '1'
         if (bit != '0' && bit != '1') continue;
@@ -321,12 +338,12 @@ void Huffman::decodeFile() const
         }
 
         // if leaf, output and reset
-        if (!curr->leftChild && !curr->rightChild) {
-            out.put(curr->ch);
+        if (isLeaf(curr)) {
+            out.put(curr->ch);             // Write decoded char
             chars_on_line++;
-            if (chars_on_line >= max_chars_per_line) {
+            if (chars_on_line >= max_chars_per_line) {   // wrap every max_bits_per_line (50) bits
                 out.put('\n');
-                chars_on_line = 0;
+                chars_on_line = 0;   // newline so reset chars on line to 0
             }
             curr = root_;
         }
@@ -355,32 +372,44 @@ void Huffman::printTree() const
 
     string line;
     while (true) {
-        cout << "\nSelect traversal - (I)norder, pr(E)order, po(S)torder (or Q to quit): ";
+
+        // Print options
+        cout << "\nSelect traversal - (I)norder, pr(E)order, po(S)torder, (R)everse Inorder (or Q to quit): ";
+
+        // get option from user
         if (!getline(cin, line)) {
             cout << "Input error; aborting tree print.\n";
             continue;
         }
-        if (line.empty()) continue;
-        if (line == "Q" || line == "q") break;
 
-        char choice = toupper(line[0]);
-        if (choice == 'I') {
-            cout << "\n--- Inorder (Left-Root-Right) ---\n";
-            inorder_display(root_, 0);
-        }
-        else if (choice == 'E') {
-            cout << "\n--- Preorder (Root-Left-Right) ---\n";
-            preorder_display(root_, 0);
-        }
-        else if (choice == 'S') {
-            cout << "\n--- Postorder (Left-Right-Root) ---\n";
-            postorder_display(root_, 0);
-        }
-        else {
-            cout << "Invalid choice; please enter I, E, or S.\n";
+        if (line.empty()) continue;
+
+        char choice = toupper(line[0]);  // Capitalize user input
+
+        if (choice == 'Q') break;
+        switch (choice) {
+            case 'I':
+                cout << "\n--- Inorder (Left-Root-Right) ---\n";
+                inorder_display(root_, 0);
+                break;
+            case 'E':
+                cout << "\n--- Preorder (Root-Left-Right) ---\n";
+                preorder_display(root_, 0);
+                break;
+            case 'S':
+                cout << "\n--- Postorder (Left-Right-Root) ---\n";
+                postorder_display(root_, 0);
+                break;
+            case 'R':
+                cout << "\n--- Reverse Inorder (Right-Root-Left) ---\n";
+                reverseInorder_display(root_, 0);
+                break;
+            default:
+                cout << "Invalid choice; please enter I, E, S, R, or Q.\n";
         }
     }
 }
+
 
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -396,25 +425,35 @@ void Huffman::encodeWord() const
         return;
     }
 
+    
     bool valid;
     string word;
     while (true) {
-        cout << "\nEnter a word to encode : ";
+        cout << "\nEnter a word to encode (or Q to quit): ";
+
         if (!getline(cin, word)) {
-            cin.clear();
+            cin.clear();             // I/O error: retry
             continue;
         }
-        valid = true;
-        string result;
-        string ascii;
+
+        if (word.empty()) continue;  
+        if (word[0] == 'Q' || word[0] == 'q') break;
+
+        valid = true;    // Flag for user input's characters if they exist in the huffman tree
+        string result;   // Store the huffman code
+        string ascii;    // Store the ascii binary code
+
+        // Check if any character entered can be found in the huffman tree
         for (unsigned char c : word) {
-            int idx = c - 32;
+            int idx = c - 32;   // index for huffman codes hash table
+
             if (idx < 0 || idx >= NUM_PRINTABLE || codes_[idx].empty()) {
                 cout << "Error: no Huffman code for character '" << static_cast<char>(c)
                      << "'. Please try again.\n";
                 valid = false;
                 break;
             }
+
             // merge Huffman bits
             result += codes_[idx];
             // build ASCII‐binary
@@ -422,22 +461,11 @@ void Huffman::encodeWord() const
                 ascii += ((c >> bit) & 1) ? '1' : '0';
             }
         }
+
         if (valid) {
             cout << "Huffman encoding: " << result << "\n";
             cout << "ASCII Binary representation : " << ascii << "\n";
         }
-
-		cout << "\n(Press Q to return to the menu, or any other key to look up again) : ";
-		if (!getline(cin, word)) {
-            // I/O error: retry
-            cin.clear();
-            continue;
-        }
-        if (word.empty()) {
-            continue;
-        }
-		if (word[0] == 'Q' || word[0] == 'q')
-			break;
     }
 }
 
@@ -454,42 +482,52 @@ void Huffman::decodeText() const
         return;
     }
 
-    string bits;
+    string bits;   // store user input (decoded text)
     while (true) {
         cout << "\nEnter Huffman bit-string to decode (or Q to quit): ";
+
         if (!getline(cin, bits)) {
             cin.clear();
             continue;
         }
-        if (bits == "Q" || bits == "q") {
-            break;
-        }
+        
+        if (bits.empty()) continue;
+        if (bits == "Q" || bits == "q") break;
 
-        string decoded;
+        string decoded;   // store result
         SingleNode* curr = root_;
         bool valid = true;
+                
+        // Process each bit in input
         for (char bit : bits) {
-            if (bit == '0') {
+            if (bit == '0') {     // go left on '0'
                 curr = curr->leftChild;
             }
-            else if (bit == '1') {
+            else if (bit == '1') {    // go right on '1'
                 curr = curr->rightChild;
             }
             else {
+                // invalid character encountered
                 cout << "Error: invalid character '" << bit << "'. Only '0' or '1' allowed.\n";
                 valid = false;
                 break;
             }
+
+            // if traversal leads to null, bit-string invalid
             if (!curr) {
                 cout << "Error: path led to null—this bit-string is not valid.\n";
                 valid = false;
                 break;
             }
-            if (!curr->leftChild && !curr->rightChild) {
-                decoded.push_back(curr->ch);
-                curr = root_;
+
+            // if a leaf node reached, append character and reset
+            if (isLeaf(curr)) {
+                decoded.push_back(curr->ch);   // store decoded char
+                curr = root_;                  // restart at root for next bits
             }
         }
+
+        // display result if no errors
         if (valid) {
             cout << "Decoded text: " << decoded << "\n";
         }
@@ -498,7 +536,7 @@ void Huffman::decodeText() const
 
 
 // ──────────────────────────────────────────────────────────────────────────
-// Below: static helper functions for tree traversal.
+// Below: helper functions for tree traversal.
 // ──────────────────────────────────────────────────────────────────────────
 
 // preorder (Root-Left-Right)
@@ -507,7 +545,8 @@ void Huffman::preorder_display(SingleNode* node, int level) const
     if (!node) return;
 
     for (int i = 0; i < level; ++i) cout << '-';
-    if (!node->leftChild && !node->rightChild)
+
+    if (isLeaf(node))
         cout << '[' << node->ch;
     else
         cout << "[*";
@@ -523,12 +562,15 @@ void Huffman::inorder_display(SingleNode* node, int level) const
     if (!node) return;
 
     inorder_display(node->leftChild, level + 1);
+
     for (int i = 0; i < level; ++i) cout << '-';
-    if (!node->leftChild && !node->rightChild)
+
+    if (isLeaf(node))
         cout << '[' << node->ch;
     else
         cout << "[*";
     cout << "(" << node->freq << ")]\n";
+
     inorder_display(node->rightChild, level + 1);
 }
 
@@ -539,10 +581,36 @@ void Huffman::postorder_display(SingleNode* node, int level) const
 
     postorder_display(node->leftChild,  level + 1);
     postorder_display(node->rightChild, level + 1);
+
     for (int i = 0; i < level; ++i) cout << '-';
-    if (!node->leftChild && !node->rightChild)
+
+    if (isLeaf(node))
         cout << '[' << node->ch;
     else
         cout << "[*";
     cout << "(" << node->freq << ")]\n";
+}
+
+// reverse inorder (Right-Root-Left)
+void Huffman::reverseInorder_display(SingleNode* node, int level) const
+{
+    if (!node) return;
+
+    reverseInorder_display(node->rightChild, level + 1);
+
+    for (int i=0; i<level; ++i) cout << '-';
+
+    if (isLeaf(node)) 
+        cout << '[' << node->ch;
+    else 
+        cout << "[*";
+    cout << "(" << node->freq << ")]\n";
+
+    reverseInorder_display(node->leftChild, level+1);
+}
+
+
+// isLeaf helper function definition
+bool isLeaf(SingleNode* node) {
+    return node && !node->leftChild && !node->rightChild;
 }
